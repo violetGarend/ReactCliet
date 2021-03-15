@@ -5,7 +5,11 @@ export default class admin extends Component {
         return (
             <div>
                 admin...
+                <button onClick={this.a}>🔙</button>
             </div>
         )
+    }
+    a=()=>{
+        this.props.history.push('/login')
     }
 }

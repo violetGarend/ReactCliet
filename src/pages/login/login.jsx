@@ -3,7 +3,9 @@ import './login.less'
 //引入图片
 import logo from './image/05.jpg'
 //引入antd组件们
-import { Form, Input, Button } from 'antd';
+import { Form, Input, Button,message } from 'antd';
+//引入axios
+import {reqLogin} from '../../api/index.js'
 export default class login extends Component {
     render() {
         return (
@@ -37,8 +39,8 @@ export default class login extends Component {
                                     max: 12,
                                     message: '<12'
                                 }, {
-                                    min: 6,
-                                    message: '>6'
+                                    min: 5,
+                                    message: '>5'
                                 }
                             ]}
                         >
@@ -58,8 +60,8 @@ export default class login extends Component {
                                     max: 12,
                                     message: '<12'
                                 }, {
-                                    min: 6,
-                                    message: '>6'
+                                    min: 5,
+                                    message: '>5'
                                 }
                             ]}
                         >
@@ -75,14 +77,37 @@ export default class login extends Component {
             </div>
         )
     }
-    onValuesChange = (e) => {
-        console.log(e);
+    state={
+        username:'',
+        password:''
     }
-    onFinish = (e) => {
-        console.log(e);
+    onValuesChange = (e) => {
+        if(e.username){
+            this.setState({
+                    username:e.username,
+            })
+        }else{
+            this.setState({
+                    password:e.password,
+            })
+        }
         
     }
-    onFinishFailed = (e) => {
-        console.log(e);
+    onFinish = (e) => {
+        reqLogin(this.state.username,this.state.password)
+        .then(res=>{
+            if(res.data.status===1){
+                message.error('用户名或密码错误')
+            }else{
+                message.success('登陆成功')
+                this.props.history.replace(`/admin`)
+            }
+        })
+        .catch(()=>{
+            message.error('服务器错误')
+        })
+    }
+    onFinishFailed = () => {
+        message.error('请输入正确的用户名和密码错误')
     }
 }
