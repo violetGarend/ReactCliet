@@ -11,5 +11,6 @@ export default class admin extends Component {
     }
     a=()=>{
         this.props.history.push('/login')
+        console.log('eee');
     }
 }
