@@ -15,33 +15,74 @@ export default class login extends Component {
                 <div className="login_content">
                     <h1>用户登录</h1>
 
+                    {/* From */}
                     <Form
-                        name="basic"
-                        initialValues={{ remember: true }}
+                        onValuesChange={this.onValuesChange}
+                        onFinish={this.onFinish}
+                        onFinishFailed={this.onFinishFailed}
+                        initialValues={{
+                            remember: true,
+                        }}
                     >
                         <Form.Item
-                            label="Username"
                             name="username"
-                            rules={[{ required: true, message: 'Please input your username!' }]}
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Please input your username!',
+                                }, {
+                                    pattern: /^\w*\w$/,
+                                    message: '须是英文，数字，或下划线>6'
+                                }, {
+                                    max: 12,
+                                    message: '<12'
+                                }, {
+                                    min: 6,
+                                    message: '>6'
+                                }
+                            ]}
                         >
-                            <Input />
+                            <Input placeholder="Username" />
                         </Form.Item>
 
                         <Form.Item
-                            label="Password"
                             name="password"
-                            rules={[{ required: true, message: 'Please input your password!' }]}
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Please input your password!',
+                                }, {
+                                    pattern: /^\w*\w$/,
+                                    message: '须是英文，数字，或下划线>6'
+                                }, {
+                                    max: 12,
+                                    message: '<12'
+                                }, {
+                                    min: 6,
+                                    message: '>6'
+                                }
+                            ]}
                         >
-                            <Input.Password />
+                            <Input.Password placeholder="Password" />
                         </Form.Item>
                         <Form.Item>
                             <Button type="primary" htmlType="submit">
-                                登录
+                                登陆
                             </Button>
                         </Form.Item>
                     </Form>
                 </div>
             </div>
         )
+    }
+    onValuesChange = (e) => {
+        console.log(e);
+    }
+    onFinish = (e) => {
+        console.log(e);
+        
+    }
+    onFinishFailed = (e) => {
+        console.log(e);
     }
 }
