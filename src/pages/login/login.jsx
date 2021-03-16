@@ -4,10 +4,19 @@ import './login.less'
 import logo from './image/05.jpg'
 //引入antd组件们
 import { Form, Input, Button,message } from 'antd';
+import {Redirect} from 'react-router-dom'
 //引入axios
 import {reqLogin} from '../../api/index.js'
+//引入bus
+import utils from '../../utils/utils'
+//引入localStorage
+import {setUser} from '../../utils/store'
 export default class login extends Component {
     render() {
+        //查看是否用于user了，有就不准进到这个页面
+        if(utils.user.userid){
+            return (<Redirect to="/admin"/>            )
+        }
         return (
             <div className="login">
                 <header className="login_heard">
@@ -100,6 +109,10 @@ export default class login extends Component {
                 message.error('用户名或密码错误')
             }else{
                 message.success('登陆成功')
+                //保存到bus
+                utils.user.userid = this.state.username
+                //保存到本地存储中
+                setUser(this.state.username)
                 this.props.history.replace(`/admin`)
             }
         })
