@@ -1,20 +1,24 @@
 import React, { Component } from 'react'
 import img from './06.jpg'
 import './index.less'
-import { Menu, Button } from 'antd';
-import {
-    AppstoreOutlined,
-    MenuUnfoldOutlined,
-    MenuFoldOutlined,
-    PieChartOutlined,
-    DesktopOutlined,
-    ContainerOutlined,
-    MailOutlined,
-} from '@ant-design/icons';
+import { Link, withRouter } from 'react-router-dom'
+import { Menu } from 'antd';
+import menuConfig from '../../config/menuConfig'
 
 const { SubMenu } = Menu;
-export default class LeftNav extends Component {
+class LeftNav extends Component {
     render() {
+        //用于随时指定选中card
+        let action_path = this.props.history.location.pathname.slice(7)
+        //自动展开cards
+        let action_keys
+        menuConfig.forEach(item => {
+            if (item.children) {
+                item.children.forEach(items => {
+                    if (action_path === items.path) action_keys = item.path
+                })
+            }
+        })
         return (
             <div className="left_nav">
                 <div className="left_nav_header">
@@ -22,41 +26,33 @@ export default class LeftNav extends Component {
                     <h1>拉姆后台</h1>
                 </div>
 
-                <div style={{ width: 250 }} class="left_nav_menu">
-                    <Button type="primary" style={{ marginBottom: 16 }}>
-                    </Button>
+                <div style={{ width: 250 }} className="left_nav_menu">
                     <Menu
-                        defaultSelectedKeys={['1']}
-                        defaultOpenKeys={['sub1']}
+                        selectedKeys={[action_path]}
+                        defaultOpenKeys={[action_keys]}
                         mode="inline"
                         theme="light"
                     >
-                        <Menu.Item key="1" icon={<PieChartOutlined />}>
-                            Option 1
-          </Menu.Item>
-                        <Menu.Item key="2" icon={<DesktopOutlined />}>
-                            Option 2
-          </Menu.Item>
-                        <Menu.Item key="3" icon={<ContainerOutlined />}>
-                            Option 3
-          </Menu.Item>
-                        <SubMenu key="sub1" icon={<MailOutlined />} title="Navigation One">
-                            <Menu.Item key="5">Option 5</Menu.Item>
-                            <Menu.Item key="6">Option 6</Menu.Item>
-                            <Menu.Item key="7">Option 7</Menu.Item>
-                            <Menu.Item key="8">Option 8</Menu.Item>
-                        </SubMenu>
-                        <SubMenu key="sub2" icon={<AppstoreOutlined />} title="Navigation Two">
-                            <Menu.Item key="9">Option 9</Menu.Item>
-                            <Menu.Item key="10">Option 10</Menu.Item>
-                            <SubMenu key="sub3" title="Submenu">
-                                <Menu.Item key="11">Option 11</Menu.Item>
-                                <Menu.Item key="12">Option 12</Menu.Item>
-                            </SubMenu>
-                        </SubMenu>
+                        {
+                            menuConfig.map((item) => {
+                                if (!item.children) {
+                                    return this.createMenuItem(item)
+                                } else {
+                                    return (<SubMenu key={item.path} icon={<item.icon />} title={item.title}>
+                                        {item.children.map((item) => {
+                                            return this.createMenuItem(item)
+                                        })}
+                                    </SubMenu>)
+                                }
+                            })}
                     </Menu>
                 </div>
             </div>
         )
     }
+    //用于创建menu.item
+    createMenuItem = (item) => {
+        return (<Menu.Item key={item.path} icon={<item.icon />}><Link to={'/admin/' + item.path}>{item.title}</Link></Menu.Item>)
+    }
 }
+export default withRouter(LeftNav)
