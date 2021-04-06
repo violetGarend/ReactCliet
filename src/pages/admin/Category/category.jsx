@@ -2,9 +2,10 @@ import React, { Component } from 'react'
 //引入antd组件
 import { Card, Button, Table, Modal } from 'antd';
 //获取数据
-import { reqCategorys, reqUpdateCategorys } from '@/api/index.js'
+import { reqCategorys, reqUpdateCategorys, reqAddCategorys } from '@/api/index.js'
 //二次封装的Form
 import ZhenForm from '@/components/ZhenForm/index.jsx'
+import AddForm from '@/components/AddForm/index.jsx'
 //图标
 import { PlusOutlined, DoubleRightOutlined } from '@ant-design/icons';
 export default class Category extends Component {
@@ -64,11 +65,11 @@ export default class Category extends Component {
         this.id = item._id
     }
     //按确定按钮
-     confirmChange = async() => {
+    confirmChange = async () => {
         //取消model显示
         this.stateAddOrUpdateBack()
         //发送请求 
-        await reqUpdateCategorys(this.id,this.newName)
+        await reqUpdateCategorys(this.id, this.newName)
         //更新页面
         this.getcategoryContent()
     }
@@ -81,6 +82,27 @@ export default class Category extends Component {
     //新的Name，用于发送请求
     changeName = (newName) => {
         this.newName = newName
+    }
+    //记录分类
+    addRecord=(parentId,categoryName)=>{
+        this.categoryName = categoryName
+        this.parentId = parentId
+    }
+    //添加分类
+    addClass = () => {
+        const {categoryName,parentId} = this
+        console.log(categoryName,parentId);
+        reqAddCategorys(categoryName,parentId)
+        .then(()=>{
+            //如果添加的是当前页面，更新
+            if(parentId===this.state.parentId)  this.getcategoryContent()
+            //隐藏添加框
+            this.stateAddOrUpdateBack()
+        })
+    }
+    //更新选中
+    updateSelect=(parentId)=>{
+        this.parentId = parentId
     }
     render() {
         const columns = [
@@ -101,12 +123,16 @@ export default class Category extends Component {
             }
         ];
         const { categoryContent, newcategoryContent, parentId, selectName, stateAddOrUpdate } = this.state
+        this.parentId = this.state.parentId
         return (
             <div className="category">
                 <Modal visible={stateAddOrUpdate === 1} onCancel={this.stateAddOrUpdateBack} onOk={this.confirmChange} title="修改分类" okText="确定" cancelText="取消">
                     <ZhenForm name={this.name} changeName={this.changeName}></ZhenForm>
                 </Modal>
-                <Modal visible={stateAddOrUpdate === 2} onCancel={this.stateAddOrUpdateBack} title="添加分类" okText="确定" cancelText="取消"></Modal>
+
+                <Modal visible={stateAddOrUpdate === 2} onCancel={this.stateAddOrUpdateBack} onOk={this.addClass} title="添加分类" okText="确定" cancelText="取消">
+                    <AddForm categoryContent={categoryContent} parentId={this.parentId} addClass={this.addRecord} updateSelect={this.updateSelect}></AddForm>
+                </Modal>
                 <Card title={<div><span style={{ color: parentId === '0' ? '' : '#1e90ff', userSelect: 'none', cursor: parentId === '0' ? '' : 'pointer', marginRight: '10px' }} onClick={this.backParentId}>一级分类列表</span><DoubleRightOutlined style={{ display: parentId === '0' ? 'none' : '' }} /><span>{selectName}</span></div>} extra={<Button type="primary" onClick={this.classifyAdd}><PlusOutlined />添加</Button>} >
                     <Table dataSource={parentId === '0' ? categoryContent : newcategoryContent} columns={columns} rowKey="_id" bordered loading={this.state.categoryContent.length < 0}
                         pagination={{ pageSize: 5, showQuickJumper: true, simple: true }}>

@@ -3,7 +3,6 @@ import { Form,Input } from 'antd'
 export default class ZhenForm extends Component {
     render() {
         const {name} = this.props
-        this.props.changeName(name)
         return (
             <div>
                 <Form  name="control-hooks">
